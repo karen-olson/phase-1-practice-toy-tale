@@ -39,7 +39,6 @@ function handleToyData(toyData) {
     img.className = "toy-avatar";
 
     const likeCounter = document.createElement("p");
-    likeCounter.id = "like-counter";
     if (toyObject.likes === 1) {
       likeCounter.innerText = `${toyObject.likes} like`;
     } else {
@@ -57,11 +56,11 @@ function handleToyData(toyData) {
   }
 
   // FUNCTION handleLike(e)
-  // How can I get handleLike to have access to the toyObject and likeCounter?
-  // Tried defining it as a parameter and passing it in as an argument on line 53, but it didn't work
   function handleLike(e) {
     const id = parseInt(e.target.id);
-    const numberOfLikes = toyObject.likes + 1;
+    const matchingToy = toyData.find((element) => element["id"] === id);
+    const currentLikes = matchingToy["likes"];
+    const newLikes = currentLikes + 1;
 
     fetch(`http://localhost:3000/toys/${id}`, {
       method: "PATCH",
@@ -70,20 +69,17 @@ function handleToyData(toyData) {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        likes: numberOfLikes,
+        likes: newLikes,
       }),
     })
       .then((resp) => resp.json())
       .then((updatedToyObject) => updateLikeCounter(updatedToyObject));
 
     function updateLikeCounter(updatedToyObject) {
-      const likeCounter = document.querySelector("#like-counter");
-      console.log("like counter: ", likeCounter);
-
-      if (toyObject.likes === 1) {
-        likeCounter.innerText = `${updatedToyObject.likes} like`;
+      if (updatedToyObject.likes === 1) {
+        e.target.previousElementSibling.innerText = `${updatedToyObject.likes} like`;
       } else {
-        likeCounter.innerText = `${updatedToyObject.likes} likes`;
+        e.target.previousElementSibling.innerText = `${updatedToyObject.likes} likes`;
       }
     }
   }
