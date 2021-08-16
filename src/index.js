@@ -59,34 +59,32 @@ function handleToyData(toyData) {
     likeButton.className = "like-btn";
     likeButton.id = toyObject.id;
 
-    // Add an event listener to the like button and pass it handleLike
-    // Whenever a like button is clicked, it will invoke handleLike
-    likeButton.addEventListener("click", handleLike);
-
     // Append the new elements to the "Toy Collection" container
     li.append(h1, img, likeCounter, likeButton);
     toyCollection.appendChild(li);
   }
 
-  // FUNCTION handleLike(e)
-  function handleLike(e) {
-    // Get the id of the button that's been clicked
-    const id = parseInt(e.target.id);
+  // This part is working - the click event is being triggered and e is accessible
+  const likeButtons = document.querySelectorAll(".like-btn");
+  likeButtons.forEach((likeButton) =>
+    likeButton.addEventListener("click", (e) => handleLike(e))
+  );
 
-    // Find the toy object using the ID
+  // FUNCTION handleLike(e)
+  // This is logging 1 like per button BEFORE refreshing the page.
+  // The button looks disabled after it's been clicked once, but e.target.disabled is false
+  function handleLike(e) {
+    // Get the id of the button that's been clicked and use it to look up the corresponding toy object
+    e.preventDefault();
+    const id = parseInt(e.target.id);
     const matchingToy = toyData.find((element) => element["id"] === id);
 
-    //Look up how many likes that toy currently has and save it in a variable
-    const currentLikes = matchingToy["likes"];
+    //Look up how many likes that toy currently has, add 1, and save it in a variable
+    console.log("current likes: ", matchingToy["likes"]);
+    const newLikes = matchingToy["likes"] + 1;
+    console.log("new likes before fetch request: ", newLikes);
 
-    // Increase the value of currentLikes by 1
-    const newLikes = currentLikes + 1;
-
-    // Communicate with the server using a patch request to update part of the toy object
-    // Send and receive data in JSON format
-    // Send the updated like count in the body as a string
-    // Once the promise is fulfilled, convert the response back to a JS object
-    // Update the like count in the DOM by calling updateLikeCounter on the udpatedToyObject
+    // Communicate with the server using a patch request to update the toy's likes property
     fetch(`http://localhost:3000/toys/${id}`, {
       method: "PATCH",
       headers: {
@@ -100,11 +98,9 @@ function handleToyData(toyData) {
       .then((resp) => resp.json())
       .then((updatedToyObject) => updateLikeCounter(updatedToyObject));
 
-    // DOM Manipulator function
-    // Check to see how many likes the updatedToyObject has
-    // Based on whether the number of likes will be singular or plural,
-    //    update the DOM by accessing the target's "previous element sibling" property and changing the inner text.
+    // Render the new number of likes in the DOM
     function updateLikeCounter(updatedToyObject) {
+      console.log("new likes after fetch request: ", updatedToyObject.likes);
       if (updatedToyObject.likes === 1) {
         e.target.previousElementSibling.innerText = `${updatedToyObject.likes} like`;
       } else {
