@@ -30,31 +30,6 @@ function handleToyData(toyData) {
   for (const toyObject of toyData) {
     renderOneToy(toyObject);
   }
-  // Event listener for form
-  const form = document.querySelector(".add-toy-form");
-  form.addEventListener("submit", (e) => handleSubmit(e));
-
-  // FUNCTION handleSubmit(e)
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    const dataObject = {
-      name: e.target[0].value,
-      image: e.target[1].value,
-      likes: 0,
-    };
-
-    fetch("http://localhost:3000/toys", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(dataObject),
-    })
-      .then((resp) => resp.json())
-      .then((newToyObject) => renderOneToy(newToyObject));
-  }
 }
 
 // FUNCTION renderOneToy(toyObject)
@@ -123,4 +98,30 @@ function handleLike(e) {
         e.target.previousElementSibling.innerText = `${updatedToyObject.likes} likes`;
       }
     });
+}
+
+// Event listener for form
+const form = document.querySelector(".add-toy-form");
+form.addEventListener("submit", (e) => handleSubmit(e));
+
+// FUNCTION handleSubmit(e)
+function handleSubmit(e) {
+  e.preventDefault();
+
+  const dataObject = {
+    name: e.target[0].value,
+    image: e.target[1].value,
+    likes: 0,
+  };
+
+  fetch("http://localhost:3000/toys", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(dataObject),
+  })
+    .then((resp) => resp.json())
+    .then((newToyObject) => renderOneToy(newToyObject));
 }
